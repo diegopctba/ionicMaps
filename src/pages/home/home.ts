@@ -12,12 +12,13 @@ export class HomePage {
 
   @ViewChild('map') mapElement: ElementRef;
   map: any;
+  geocoder: any;
   address: string;
   constructor(public navCtrl: NavController, public geolocation: Geolocation) {
 
   }
 
-  ionViewDidLoad() {
+  ionViewWillEnter() {
     this.loadMap();
   }
 
@@ -32,35 +33,13 @@ export class HomePage {
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
-      google.maps.event.addDomListener(this.address, 'click', function() {
-        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
- 
-        var mapOptions = {
-            center: myLatlng,
-            zoom: 15,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
- 
-        var map = new google.maps.Map(this.map, mapOptions);
- 
-        /*navigator.geolocation.getCurrentPosition(function(pos) {
-            map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-            var myLocation = new google.maps.Marker({
-                position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
-                map: map,
-                title: "My Location"
-            });
-        });*/
- 
-        this.map = map;
-    });
   }
 
 
   loadMap() {
-
+    console.log('iniciando');
     this.geolocation.getCurrentPosition().then((position) => {
-
+      console.log('posicao gps ' + position);
       let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 
       let mapOptions = {
@@ -70,7 +49,7 @@ export class HomePage {
       }
 
       this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-      
+      this.geocoder = new google.maps.Geocoder();
       console.log('position original ' + this.map.latLng);
 
     }, (err) => {
@@ -82,21 +61,47 @@ export class HomePage {
 
   searchLocal() {
     // google.maps.event.addListener(this.address, 'change', () => {
-    let geocoder = new google.maps.Geocoder();let latLng;
-    geocoder.geocode({ 'address': this.address }, function (results, status) {
+    var latLng;
+    var infoWindow = new google.maps.InfoWindow({ map: this.map });
+    //let map = this.map;
+    this.geocoder.geocode({ 'address': this.address }, function (results, status, map) {
       if (status === 'OK') {
 
+        console.log('center original ' + this.map.center);
         latLng = results[0].geometry.location;
-        this.map.center = this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.map);
+        // this.map.center = this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.map);
+        /*        this.map.center = latLng;
+                this.map.position = latLng;
+                this.map.zoom = 15;
+                console.log('bounds '+this.map.bounds);
+                this.map.mapTypeId = google.maps.MapTypeId.ROADMAP
+        */
+        infoWindow.setPosition(latLng);
+        //infoWindow.setZoom(8);
+        //infoWindow.setContent('Location found.');
+        let marker = new google.maps.Marker({
 
-        /*let mapOptions = {
-          center: latLng,
-          zoom: 15,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        }*/
+          map: this.map,
+          animation: google.maps.Animation.DROP,
+          position: latLng,          
+          title: this.address
+        });
+        marker.addListener('click', function () {
+          this.infowindow.open(this.map, marker);
+        });        //map.setCenter(latLng)
+
+        //this.map.position = latLng;
+        //this.map.center = latLng;
+
+        //        let infoWindow = new google.maps.InfoWindow({
+        //          position: latLng,
+        //          content: 
+        //        });
         //this.map.setOptions(mapOptions);
-//        var loc = results[0].geometry.location;
-        console.log('position original ' + this.map.position);
+        //this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+
+        console.log('center searched ' + this.map.center);
+        //        var loc = results[0].geometry.location;
         /*let mapOptions = {
            center: loc,
            zoom: 15,
@@ -119,11 +124,13 @@ export class HomePage {
          });*/
         //let content = "<h4>Information!</h4>";
         //this.addInfoWindow(marker, content);
-        console.log('position searched ' + this.map.position);
       }
     });
+    console.log('position after ' + this.map.position);
+    console.log('center after ' + this.map.center);
+    console.log('latLng after ' + latLng);
     this.map.setCenter(latLng);
-        this.map.setZoom(15);
+    this.map.setZoom(15);
     //  });
   }
 
