@@ -4,7 +4,8 @@
       Map
     </ion-title>
     <ion-buttons end>
-      <button ion-button (click)="addMarker()"><ion-icon name="add"></ion-icon>Add Marker</button>
+     <!--<button ion-button (click)="addMarker()"><ion-icon name="add"></ion-icon>Add Marker</button>-->
+     <button on-swipe-left="onSwipeLeft()">Add Marker</button>
     </ion-buttons>  
   </ion-navbar>
 </ion-header>

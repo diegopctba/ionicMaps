@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, LoadingController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 
 declare var google;
@@ -14,7 +14,8 @@ export class HomePage {
   map: any;
   geocoder: any;
   address: string;
-  constructor(public navCtrl: NavController, public geolocation: Geolocation) {
+  constructor(public navCtrl: NavController, public geolocation: Geolocation,
+    public loadingCtrl: LoadingController) {
 
   }
 
@@ -62,7 +63,14 @@ export class HomePage {
   searchLocal() {
     // google.maps.event.addListener(this.address, 'change', () => {
     var latLng;
+    let loader = this.loadingCtrl.create({
+      content: 'Aguarde...',
+      duration: 3000,
+      spinner: 'dots'
+    });
+    loader.present();
     var infoWindow = new google.maps.InfoWindow({ map: this.map });
+    this.searchWayPoints();
     //let map = this.map;
     this.geocoder.geocode({ 'address': this.address }, function (results, status, map) {
       if (status === 'OK') {
@@ -83,12 +91,14 @@ export class HomePage {
 
           map: this.map,
           animation: google.maps.Animation.DROP,
-          position: latLng,          
+          position: latLng,
           title: this.address
         });
         marker.addListener('click', function () {
           this.infowindow.open(this.map, marker);
-        });        //map.setCenter(latLng)
+        });
+        loader.dismiss();
+        //map.setCenter(latLng)
 
         //this.map.position = latLng;
         //this.map.center = latLng;
@@ -148,22 +158,53 @@ export class HomePage {
 
   }
 
-  addInfoWindow(marker, content) {
+  searchWayPoints() {
+    var directionsService = new google.maps.DirectionsService();
+    var directions = {
+      origin: 'Eugenio guariza',
+      destination: 'joao marchesini',
+      optimizeWaypoints: true,
+      travelMode: google.maps.DirectionsTravelMode.DRIVING,
+      waypoints: [{
+        'location': 'couto pereira'//0 
+      }, {
+        'location': 'big torres'//1
+      }, {
+        'location': 'parque da fonte'//2
+      }, {
+        'location': 'sao jose dos pinhais'//3
+      }
+      ]
+    }
 
-    /* let geoLoc = new google.maps.geolocation({
-       position: this.map.getCenter()
-     });
-   */
-    let infoWindow = new google.maps.InfoWindow({
-      content: content
-    });
+  directionsService.route(directions, function(response, status) {
+    console.log('status directions ' + status);
+    if (status == 'OK') {
+      var order = response.routes[0].waypoint_order;//[0,2,3,1]
+      for (var index = 0; index < order.length; index++) {
+        var element = order[index];
+          console.log(index + ' ' +directions.waypoints[element].location);
+      }
+    }
+  })
+}
 
-    google.maps.event.addListener(marker, 'click', () => {
-      infoWindow.open(this.map, marker);
-    });
+addInfoWindow(marker, content) {
+
+  /* let geoLoc = new google.maps.geolocation({
+     position: this.map.getCenter()
+   });
+ */
+  let infoWindow = new google.maps.InfoWindow({
+    content: content
+  });
+
+  google.maps.event.addListener(marker, 'click', () => {
+    infoWindow.open(this.map, marker);
+  });
 
 
-  }
+}
 
 
 }
