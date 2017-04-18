@@ -70,7 +70,7 @@ export class HomePage {
     });
     loader.present();
     var infoWindow = new google.maps.InfoWindow({ map: this.map });
-    this.searchWayPoints();
+   // this.searchWayPoints();
     //let map = this.map;
     this.geocoder.geocode({ 'address': this.address }, function (results, status, map) {
       if (status === 'OK') {

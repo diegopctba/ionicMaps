@@ -11,7 +11,7 @@ import { RoutePage } from '../pages/route/route';
 })
 export class MyApp {
    @ViewChild(Nav) nav: Nav;
-   rootPage:any = HomePage;
+   rootPage:any = RoutePage;
    pages: Array<{title: string, component: any, icon: string}>;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
@@ -25,7 +25,7 @@ export class MyApp {
     this.pages = [
       { title: 'Início', component: HomePage, icon: 'home' },
       //{ title: 'List', component: ListPage , icon: 'list'},
-      { title: 'Rotas', component: RoutePage, icon: 'navigate' }
+      { title: 'Rotas', component: RoutePage, icon: 'navigate' },
     ];
   }
 

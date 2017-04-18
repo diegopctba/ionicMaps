@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-import { RoutePage } from '../pages/route/route';
+import { RoutePage,SearchPlace } from '../pages/route/route';
 import { GoogleMaps } from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 
@@ -15,7 +15,8 @@ import { Geolocation } from '@ionic-native/geolocation';
   declarations: [
     MyApp,
     HomePage,
-    RoutePage
+    RoutePage,
+    SearchPlace
   ],
   imports: [
     BrowserModule,
@@ -25,7 +26,8 @@ import { Geolocation } from '@ionic-native/geolocation';
   entryComponents: [
     MyApp,
     HomePage,
-    RoutePage
+    RoutePage,
+    SearchPlace
   ],
   providers: [
     StatusBar,
