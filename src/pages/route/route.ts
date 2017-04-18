@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 
 declare var google;
 /**
@@ -16,13 +16,16 @@ declare var google;
 export class RoutePage {
 
   origin: String;
-  destin: String;
-  waypoints: Array<String>;
+  destination: String;
+  waypoints: Array<{ location: string }>;
   result: Array<String>;
+  sameDestination: boolean;
+  private oldDestination: String;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-    this.waypoints = new Array<String>();
-    this.waypoints.push('');
+  constructor(public navCtrl: NavController, public navParams: NavParams, public loadingCtrl: LoadingController
+    , public toastCtrl: ToastController) {
+    this.waypoints = [];
+
     this.result = new Array<String>();
   }
 
@@ -31,43 +34,55 @@ export class RoutePage {
   }
 
   routing() {
+    let loader = this.loadingCtrl.create({
+      content: 'Calculando rota...',
+      duration: 3000,
+      spinner: 'dots'
+    });
+    loader.present();
     var directionsService = new google.maps.DirectionsService();
-    var points = [];
-    for (var index = 0; index < this.waypoints.length; index++) {
-      //points += points + '{ \'locate\' :' + this.waypoints[index] + '},';
-      points.push({
-        'location': this.waypoints[index]
-      });
-    };
+
     var directions = {
       origin: this.origin,
-      destination: this.destin,
+      destination: this.destination,
       optimizeWaypoints: true,
       travelMode: google.maps.DirectionsTravelMode.DRIVING,
-      waypoints: points
+      waypoints: this.waypoints
     }
-    let origin = this.origin;
-    let destin = this.destin;
+
+    this.result = new Array<String>();
+    var route = this.result;
+    let message;
     directionsService.route(directions, function (response, status) {
       console.log('status directions ' + status);
       if (status == 'OK') {
-        let result = new Array<String>();
         var order = response.routes[0].waypoint_order;//[0,2,3,1]
-        result.push(origin);
+        //route.push(origin);
         for (var index = 0; index < order.length; index++) {
           var element = directions.waypoints[order[index]].location;
           console.log(index + ' ' + element);
-          result.push(element);
+          route.push(element);
         }
-        result.push(destin);
-        this.result = result;
+        //route.push(destin);
+        this.result = route;
+      } else {
+        if (status == 'NOT FOUND') {
+          message = 'Rota não encontrada';
+        }
       }
+      loader.dismiss();
+      
     });
-    console.log('result '+this.result);
+    console.log('result ' + this.result);
   }
 
-  destinEqualsOrigin() {
-    this.destin = this.origin;
+  destinationIsOrigin() {
+    if (this.sameDestination) {
+      this.oldDestination = this.destination;
+      this.destination = this.origin.toUpperCase();
+    } else {
+      this.destination = this.oldDestination;
+    }
   }
 
   back() {
@@ -75,10 +90,39 @@ export class RoutePage {
   }
 
   add() {
-    this.waypoints.push('');
+    if (this.waypoints.length > 21) {
+      this.presentToast("Limite máximo de pontos foi atingido...");
+    } else {
+      this.waypoints.push({ 'location': '' });
+    }
   }
 
   remove() {
-    this.waypoints.pop();
+    if (this.waypoints.length <= 0) {
+      this.presentToast("Limite mínimo de pontos foi atingido...");
+    } else {
+      this.waypoints.pop();
+    }
+  }
+
+  clear() {
+    this.waypoints = [];
+    this.origin = '';
+    this.destination = '';
+    this.oldDestination = '';
+    this.result = null;
+  }
+
+  private presentToast(messageToast) {
+    let toast = this.toastCtrl.create({
+      message: messageToast,
+      position: 'top',
+      duration: 1500
+    });
+    toast.present();
+  }
+
+  hasResult() {
+    return (this.result !== null && this.result.length > 0);
   }
 }

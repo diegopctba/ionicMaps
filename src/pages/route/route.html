@@ -4,7 +4,10 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Rotas</ion-title>
-    <ion-buttons end>
+    <ion-buttons *ngIf="!hasResult()" end>
+      <button ion-button button-right icon-only (click)="clear()" title="Remover ultima parada">
+        <ion-icon name="refresh"></ion-icon>
+      </button>
       <button ion-button button-right icon-only (click)="add()" title="Adicionar parada">
         <ion-icon name="add"></ion-icon>
       </button>
@@ -21,46 +24,53 @@
 <ion-content padding>
   
 
-  <ion-list *ngIf="result === null || result.length == 0">
+  <ion-list *ngIf="!hasResult()">
     <ion-item>
       <ion-label floating>Origem:</ion-label>
-      <ion-input [(ngModel)]="origin"></ion-input>
+      <ion-input [(ngModel)]="origin" value="{{origin | uppercase}}"></ion-input>
     </ion-item>
 
     <ion-item *ngFor="let way of waypoints; let i = index;" >
       <ion-label floating>Ponto {{i+1}}:</ion-label>
-      <ion-input [(ngModel)]="waypoints[i]" ></ion-input>
+      <ion-input [(ngModel)]="way.location" value="{{way.location | uppercase}}"></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label floating>Destino:</ion-label>
-      <ion-input [(ngModel)]="destin"></ion-input>
+      <ion-input [(ngModel)]="destination" [disabled]="sameDestination" value="{{destination | uppercase}}"></ion-input>
     </ion-item>
     <ion-item>
-      <button ion-button (click)="routing()">Calcular Rota</button>
+      <ion-label stacked>Destino é o mesmo local de origem?</ion-label>
+      <ion-toggle (ionChange)="destinationIsOrigin()" [(ngModel)]="sameDestination"></ion-toggle>
+    </ion-item>
+    <ion-item  class="button">
+      <button ion-button (click)="routing()" round large>Calcular Rota</button>
     </ion-item>
   </ion-list>
 
-  <ion-list *ngIf="result !== null && result.length > 0">
+  <ion-list *ngIf="hasResult()">
+    <ion-item>
+      <ion-textarea [disabled]="true">Melhor rota:</ion-textarea>
+    </ion-item>
     <ion-item>
       <ion-label>Origem:</ion-label>
-      <ion-input >{{origin}}</ion-input>
+      <ion-input [disabled]="true" value="{{origin | uppercase}}"></ion-input>
     </ion-item>
 
-    <ion-item *ngFor="let way of results; let i = index;" >
+    <ion-item *ngFor="let way of result; let i = index;" >
       <ion-label>Ponto {{i+1}}:</ion-label>
-      <ion-input value={{way}}></ion-input>
+      <ion-input [disabled]="true" value="{{way | uppercase}}" ></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label>Destino:</ion-label>
-      <ion-input >{{destin}}</ion-input>
+      <ion-input [disabled]="true" value="{{destination | uppercase}}"></ion-input>
       <button ion-button  (click)="remove()" icon-right icon-only>
         <ion-icon name="remove"></ion-icon>
       </button>
     </ion-item>
-    <ion-item>
-      <button ion-button (click)="back()">Voltar</button>
+    <ion-item class="button">
+      <button ion-button (click)="back()" outline round large>Voltar</button>
     </ion-item>
   </ion-list>
 
