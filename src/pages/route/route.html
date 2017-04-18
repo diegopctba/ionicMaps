@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Rotas</ion-title>
+    <ion-buttons end>
+      <button ion-button button-right icon-only (click)="add()" title="Adicionar parada">
+        <ion-icon name="add"></ion-icon>
+      </button>
+      <button ion-button button-right icon-only (click)="remove()" title="Remover ultima parada">
+        <ion-icon name="remove"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbiMeIQ5o2RPCvqxcH1jdXr5LvNzwphTY"></script>
+
+</ion-header>
+
+
+<ion-content padding>
+  
+
+  <ion-list *ngIf="result === null || result.length == 0">
+    <ion-item>
+      <ion-label floating>Origem:</ion-label>
+      <ion-input [(ngModel)]="origin"></ion-input>
+    </ion-item>
+
+    <ion-item *ngFor="let way of waypoints; let i = index;" >
+      <ion-label floating>Ponto {{i+1}}:</ion-label>
+      <ion-input [(ngModel)]="waypoints[i]" ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Destino:</ion-label>
+      <ion-input [(ngModel)]="destin"></ion-input>
+    </ion-item>
+    <ion-item>
+      <button ion-button (click)="routing()">Calcular Rota</button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="result !== null && result.length > 0">
+    <ion-item>
+      <ion-label>Origem:</ion-label>
+      <ion-input >{{origin}}</ion-input>
+    </ion-item>
+
+    <ion-item *ngFor="let way of results; let i = index;" >
+      <ion-label>Ponto {{i+1}}:</ion-label>
+      <ion-input value={{way}}></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Destino:</ion-label>
+      <ion-input >{{destin}}</ion-input>
+      <button ion-button  (click)="remove()" icon-right icon-only>
+        <ion-icon name="remove"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-item>
+      <button ion-button (click)="back()">Voltar</button>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
