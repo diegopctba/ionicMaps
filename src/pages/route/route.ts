@@ -149,11 +149,17 @@ export class RoutePage {
 
   showModal() {
     console.log('showmodal');
-    let modal = this.modalCtrl.create(SearchPlace, {
+    let searchModal = this.modalCtrl.create(SearchPlace, {
       text: this.origin,
-      bounds: this.bounds
+      bounds: this.bounds,
+      inputOrder: 0
     });
-    modal.present();
+    searchModal.onDidDismiss(response => {
+     console.log(response);
+     var order = response.inputOrder;
+     this.waypoints[order].location = response.selected;
+   });
+    searchModal.present();
   }
 
 
@@ -167,6 +173,7 @@ export class SearchPlace {
 
   str: string;
   bounds: any;
+  inputOrder: number;
   public listAddress: Array<String>;
   
   constructor(params: NavParams) {
@@ -175,7 +182,7 @@ export class SearchPlace {
       this.str = text;
     }
     this.bounds = params.get('bounds');
-
+    this.inputOrder = params.get('inputOrder');
   }
 
   onInput(ev: any) {
@@ -198,6 +205,13 @@ export class SearchPlace {
 
   clearSearch() {
     this.listAddress = new Array<String>();
+  }
+
+  select(selected) {
+    let response = {
+      'selected': selected,
+      'inputOrder': this.inputOrder
+    }
   }
 
 }
