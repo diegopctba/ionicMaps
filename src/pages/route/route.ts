@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController,ModalController } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController, ModalController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
+import { SearchPlace } from '../modal/modal';
 
 declare var google;
 /**
@@ -9,7 +10,6 @@ declare var google;
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
 @Component({
   selector: 'page-route',
   templateUrl: 'route.html',
@@ -23,6 +23,8 @@ export class RoutePage {
   result: Array<String>;
   sameDestination: boolean;
   bounds: any;
+  time: Date;
+  distance: number;
   private oldDestination: String;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public loadingCtrl: LoadingController
@@ -37,7 +39,23 @@ export class RoutePage {
     console.log('ionViewDidLoad Route');
   }
 
+  private validate() {
+    var valid = false;
+    valid = (this.origin.trim().length < 3 || this.destination.trim().length < 3);
+    this.waypoints.forEach(points => {
+      valid = (points.location.trim().length < 3);
+    });
+    if (valid) {
+      this.presentToast('Informe os campos corretamente', 'middle');
+    }
+    return valid;
+  }
+
   routing() {
+    if (this.validate()) {
+      return null;
+    }
+
     let loader = this.loadingCtrl.create({
       content: 'Calculando rota...',
       duration: 3000,
@@ -47,16 +65,22 @@ export class RoutePage {
     var directionsService = new google.maps.DirectionsService();
 
     var directions = {
-      origin: this.origin,
-      destination: this.destination,
+      origin: this.origin.trim(),
+      destination: this.destination.trim(),
       optimizeWaypoints: true,
       travelMode: google.maps.DirectionsTravelMode.DRIVING,
-      waypoints: this.waypoints
+      waypoints: null
+    }
+    if (this.waypoints.length > 0) {
+      directions.waypoints = this.waypoints;
     }
 
     this.result = new Array<String>();
+    this.distance = 0;
     var route = this.result;
     let message;
+    let distance = this.distance;
+    let time = this.time;
     directionsService.route(directions, function (response, status) {
       console.log('status directions ' + status);
       if (status == 'OK') {
@@ -67,6 +91,14 @@ export class RoutePage {
           console.log(index + ' ' + element);
           route.push(element);
         }
+        var countTime = 0;
+        var legs = response.routes[0].legs;
+        for (var i = 0; i < legs.length; i++) {
+          distance += legs[i].distance.value;
+          countTime += legs[i].duration.value;
+        }
+        console.log((distance / 1000) + 'kms em ' + (countTime/3600) + 'hrs');
+        time = new Date(countTime)
         //route.push(destin);
         this.result = route;
       } else {
@@ -95,7 +127,7 @@ export class RoutePage {
 
   add() {
     if (this.waypoints.length > 21) {
-      this.presentToast("Limite máximo de pontos foi atingido...");
+      this.presentToast("Limite máximo de pontos foi atingido...", 'top');
     } else {
       this.waypoints.push({ 'location': '' });
     }
@@ -103,7 +135,7 @@ export class RoutePage {
 
   remove() {
     if (this.waypoints.length <= 0) {
-      this.presentToast("Limite mínimo de pontos foi atingido...");
+      this.presentToast("Limite mínimo de pontos foi atingido...", 'top');
     } else {
       this.waypoints.pop();
     }
@@ -117,10 +149,13 @@ export class RoutePage {
     this.result = null;
   }
 
-  private presentToast(messageToast) {
+  private presentToast(messageToast, position) {
+    if (position === undefined) {
+      position = 'top';
+    }
     let toast = this.toastCtrl.create({
       message: messageToast,
-      position: 'top',
+      position: position,
       duration: 1500
     });
     toast.present();
@@ -130,7 +165,7 @@ export class RoutePage {
     return (this.result !== null && this.result.length > 0);
   }
 
-  
+
   ionViewWillEnter() {
     this.getCurrentPostion();
   }
@@ -147,71 +182,34 @@ export class RoutePage {
   }
 
 
-  showModal() {
-    console.log('showmodal');
+  showModal(field) {
+    var text;
+    if (field === 'origin') {
+      text = this.origin;
+    } else if (field === 'destination') {
+      text = this.destination;
+    } else {
+      text = this.waypoints[field].location;
+    }
     let searchModal = this.modalCtrl.create(SearchPlace, {
-      text: this.origin,
+      text: text,
       bounds: this.bounds,
-      inputOrder: 0
+      inputOrder: field
     });
     searchModal.onDidDismiss(response => {
-     console.log(response);
-     var order = response.inputOrder;
-     this.waypoints[order].location = response.selected;
-   });
+      if (response !== undefined && response !== null) {
+        var order = response.inputOrder;
+        if (order === 'origin') {
+          this.origin = response.selected;
+        } else if (order === 'destination') {
+          this.destination = response.selected;
+        } else {
+          this.waypoints[order].location = response.selected;
+        }
+      }
+    });
     searchModal.present();
   }
 
-
-}
-
-@Component({
-  templateUrl: 'modal.html',
-  selector: 'modal'
-})
-export class SearchPlace {
-
-  str: string;
-  bounds: any;
-  inputOrder: number;
-  public listAddress: Array<String>;
-  
-  constructor(params: NavParams) {
-    var text = params.get('text');
-    if (text != undefined && text !== null) {
-      this.str = text;
-    }
-    this.bounds = params.get('bounds');
-    this.inputOrder = params.get('inputOrder');
-  }
-
-  onInput(ev: any) {
-    this.listAddress = new Array<String>();
-    var places = new google.maps.places.AutocompleteService();
-    var text = ev.path[0].value;
-    if (text != undefined && text !== null && text.length >= 3) {
-      places.getPlacePredictions({ 'input': text, 'location': this.bounds, 'radius': 1000 }, function (results, status) {
-        console.log(status);
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          results.forEach(address => {
-            this.listAddress.push(address.description);
-          });
-        }
-      }, (err) => {
-        this.listAddress = new Array<String>();
-      });
-    }
-  }
-
-  clearSearch() {
-    this.listAddress = new Array<String>();
-  }
-
-  select(selected) {
-    let response = {
-      'selected': selected,
-      'inputOrder': this.inputOrder
-    }
-  }
 
 }

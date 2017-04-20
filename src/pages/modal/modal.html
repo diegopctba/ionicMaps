@@ -1,7 +1,7 @@
 <ion-header>
     <ion-toolbar>
         <ion-title>
-            Description
+            Lugares
         </ion-title>
         <ion-buttons start>
             <button ion-button (click)="dismiss()">
@@ -14,12 +14,13 @@
 
 
 <ion-content>
-    <ion-list>
+    <ion-list >
         <ion-item>
-            <ion-searchbar (ionInput)="onInput($event)" (ionCancel)="clearSearch()">
+            <ion-searchbar #searchbar  (ionInput)="onInput()" (ionCancel)="clearSearch()" [(ngModel)]="textField">
             </ion-searchbar>
             <ion-list>
-                <ion-item *ngFor="let address of listAddress; let a = index">
+                <ion-item *ngFor="let address of listAddress; let a = index" (click)="select(address)"
+                            [class.selected]="address === selected">
                     {{address}}
                 </ion-item>
             </ion-list>

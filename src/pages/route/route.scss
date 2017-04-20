@@ -4,4 +4,12 @@ page-route {
         text-align: center;
     }
 
+    #list ion-item button ion-icon {
+        font-size: small;
+    }
+
+    .search {
+        background-color: transparent;
+        box-shadow: none;
+    }
 }

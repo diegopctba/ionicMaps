@@ -6,7 +6,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-import { RoutePage,SearchPlace } from '../pages/route/route';
+import { RoutePage } from '../pages/route/route';
+import {SearchPlace} from '../pages/modal/modal';
 import { GoogleMaps } from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 
