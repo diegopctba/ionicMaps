@@ -61,7 +61,7 @@
 
   <ion-list *ngIf="hasResult()">
     <ion-list-header>
-      {{time | date: 'H:mm': 'UTC'}}
+      {{time | secondsToTime: time}}
     </ion-list-header>
 
     <ion-item>

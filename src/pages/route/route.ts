@@ -23,7 +23,7 @@ export class RoutePage {
   result: Array<String>;
   sameDestination: boolean;
   bounds: any;
-  time: Date;
+  time: number;
   distance: number;
   private oldDestination: String;
 
@@ -91,14 +91,13 @@ export class RoutePage {
           console.log(index + ' ' + element);
           route.push(element);
         }
-        var countTime = 0;
+        var time = 0;
         var legs = response.routes[0].legs;
         for (var i = 0; i < legs.length; i++) {
           distance += legs[i].distance.value;
-          countTime += legs[i].duration.value;
+          time += legs[i].duration.value;
         }
-        console.log((distance / 1000) + 'kms em ' + (countTime/3600) + 'hrs');
-        time = new Date(countTime)
+        console.log((distance / 1000) + 'kms em ' + (time/3600) + 'hrs');
         //route.push(destin);
         this.result = route;
       } else {

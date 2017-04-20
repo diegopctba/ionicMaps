@@ -10,14 +10,15 @@ import { RoutePage } from '../pages/route/route';
 import {SearchPlace} from '../pages/modal/modal';
 import { GoogleMaps } from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
-
+import { TimePipe } from './filter/time.pipe';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
     RoutePage,
-    SearchPlace
+    SearchPlace,
+    TimePipe
   ],
   imports: [
     BrowserModule,
@@ -28,7 +29,8 @@ import { Geolocation } from '@ionic-native/geolocation';
     MyApp,
     HomePage,
     RoutePage,
-    SearchPlace
+    SearchPlace,
+    
   ],
   providers: [
     StatusBar,
