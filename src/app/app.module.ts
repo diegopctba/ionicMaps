@@ -7,7 +7,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { RoutePage } from '../pages/route/route';
-import {SearchPlace} from '../pages/modal/modal';
+import { SearchPlace } from '../pages/modal/modal';
+import { ResultPage } from '../pages/result/result';
 import { GoogleMaps } from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation';
 import { TimePipe } from './filter/time.pipe';
@@ -18,6 +19,7 @@ import { TimePipe } from './filter/time.pipe';
     HomePage,
     RoutePage,
     SearchPlace,
+    ResultPage,
     TimePipe
   ],
   imports: [
@@ -29,6 +31,7 @@ import { TimePipe } from './filter/time.pipe';
     MyApp,
     HomePage,
     RoutePage,
+    ResultPage,
     SearchPlace,
     
   ],

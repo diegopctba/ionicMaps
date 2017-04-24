@@ -59,34 +59,5 @@
     </ion-item>
   </ion-list>
 
-  <ion-list *ngIf="hasResult()">
-    <ion-list-header>
-      {{time | secondsToTime: time}}
-    </ion-list-header>
-
-    <ion-item>
-      <ion-textarea [disabled]="true">Melhor rota:</ion-textarea>
-    </ion-item>
-    <ion-item>
-      <ion-label>Origem:</ion-label>
-      <ion-input [disabled]="true" value="{{origin | uppercase}}"></ion-input>
-    </ion-item>
-
-    <ion-item *ngFor="let way of result; let i = index;">
-      <ion-label>Parada {{i+1}}:</ion-label>
-      <ion-input [disabled]="true" value="{{way | uppercase}}"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Destino:</ion-label>
-      <ion-input [disabled]="true" value="{{destination | uppercase}}"></ion-input>
-      <button ion-button (click)="remove()" icon-right icon-only>
-        <ion-icon name="remove"></ion-icon>
-      </button>
-    </ion-item>
-    <ion-item class="button">
-      <button ion-button (click)="back()" outline round large>Voltar</button>
-    </ion-item>
-  </ion-list>
 
 </ion-content>

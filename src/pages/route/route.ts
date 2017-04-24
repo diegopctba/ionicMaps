@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, LoadingController, ToastController, ModalController } from 'ionic-angular';
+import { NavController, NavParams, LoadingController, ToastController, ModalController, App, AlertController  } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { SearchPlace } from '../modal/modal';
+import { ResultPage } from '../result/result';
 
 declare var google;
 /**
@@ -28,11 +29,12 @@ export class RoutePage {
   private oldDestination: String;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public loadingCtrl: LoadingController
-    , public toastCtrl: ToastController, public geoLocation: Geolocation, public modalCtrl: ModalController) {
+    , public toastCtrl: ToastController, public geoLocation: Geolocation, public modalCtrl: ModalController,
+              public appCtrl: App, public alertCtrl: AlertController) {
     this.waypoints = [];
     this.origin = '';
     this.listAddress = new Array<String>();
-    this.result = new Array<String>();
+    this.result = null;
   }
 
   ionViewDidLoad() {
@@ -58,8 +60,8 @@ export class RoutePage {
 
     let loader = this.loadingCtrl.create({
       content: 'Calculando rota...',
-      duration: 3000,
-      spinner: 'dots'
+      duration: 10000,
+      spinner: 'dots',
     });
     loader.present();
     var directionsService = new google.maps.DirectionsService();
@@ -75,17 +77,23 @@ export class RoutePage {
       directions.waypoints = this.waypoints;
     }
 
-    this.result = new Array<String>();
+    //this.result = new Array<String>();
     this.distance = 0;
     var route = this.result;
-    let message;
-    let distance = this.distance;
+    var distance = this.distance;
     let time = this.time;
+    let app = this.appCtrl;
+    let origin = this.origin;
+    let destination = this.destination;
+    let alertCtrl = this.alertCtrl;
     directionsService.route(directions, function (response, status) {
       console.log('status directions ' + status);
+      let message;
       if (status == 'OK') {
         var order = response.routes[0].waypoint_order;//[0,2,3,1]
         //route.push(origin);
+        this.result = new Array<String>();
+        route = new Array<String>();
         for (var index = 0; index < order.length; index++) {
           var element = directions.waypoints[order[index]].location;
           console.log(index + ' ' + element);
@@ -98,16 +106,39 @@ export class RoutePage {
           time += legs[i].duration.value;
         }
         console.log((distance / 1000) + 'kms em ' + (time/3600) + 'hrs');
+        this.distance = distance/1000;
         //route.push(destin);
         this.result = route;
+        this.distance = distance;
+        this.result = route;
+        app.getActiveNav().canGoBack();
+        app.getRootNav().push(ResultPage,  {
+          'result': route,
+          'distance': distance/1000,
+          'time': time,
+          'origin': origin,
+          'destination':destination
+        });
+
       } else {
-        if (status == 'NOT FOUND') {
+        if (status == google.maps.DirectionsStatus.NOT_FOUND) {
+          message = 'Não foi possível localizar ao menos um dos pontos informados. Verifique-os...';
+        } else if (status == google.maps.DirectionsStatus.ZERO_RESULTS) {
           message = 'Rota não encontrada';
         }
+        let alert = alertCtrl.create({
+          title: 'Atenção',
+          subTitle: message,
+          buttons: [{
+            text: 'OK',
+            role: 'destructive'
+          }]
+        });
+        alert.present();
       }
       loader.dismiss();
-
     });
+
     console.log('result ' + this.result);
   }
 
@@ -161,7 +192,7 @@ export class RoutePage {
   }
 
   hasResult() {
-    return (this.result !== null && this.result.length > 0);
+    return (this.result !== undefined && this.result !== null);
   }
 
 

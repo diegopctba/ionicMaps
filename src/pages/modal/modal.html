@@ -5,7 +5,7 @@
         </ion-title>
         <ion-buttons start>
             <button ion-button (click)="dismiss()">
-        <span ion-text color="primary" showWhen="ios">Cancel</span>
+        <span ion-text color="primary" showWhen="ios">Cancelar</span>
         <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
       </button>
         </ion-buttons>
@@ -18,7 +18,7 @@
         <ion-item>
             <ion-searchbar #searchbar  (ionInput)="onInput()" (ionCancel)="clearSearch()" [(ngModel)]="textField">
             </ion-searchbar>
-            <ion-list>
+            <ion-list id="listPlaces">
                 <ion-item *ngFor="let address of listAddress; let a = index" (click)="select(address)"
                             [class.selected]="address === selected">
                     {{address}}
