@@ -51,7 +51,12 @@ export class SearchPlace {
     },500);
     if (this.textField != undefined && this.textField !== null && this.textField.length >= 3) {
       //loader.present();
-      places.getPlacePredictions({ 'input': this.textField, 'location': this.bounds, 'radius': 100 }, function (results, status) {
+      var input = { 'input': this.textField, 'location': null, 'radius': null };
+      if (this.bounds !== undefined && this.bounds !== null) {
+        input.location = this.bounds;
+        input.radius = 100;
+      }
+      places.getPlacePredictions(input, function (results, status) {
         console.log(status);
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           results.forEach(address => {

@@ -1,12 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, ToastController } from 'ionic-angular';
 
-/**
- * Generated class for the Result page.
- *
- * See http://ionicframework.com/docs/components/#navigation for more info
- * on Ionic pages and navigation.
- */
+
 @Component({
   selector: 'page-result',
   templateUrl: 'result.html',
@@ -18,7 +13,8 @@ export class ResultPage {
   time: number;
   origin: string;
   destination: string
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams,
+              public toastCtrl: ToastController) {
     this.result = navParams.get('result');
     this.distance = navParams.get('distance');
     this.time = navParams.get('time');
@@ -30,7 +26,12 @@ export class ResultPage {
     console.log('ionViewDidLoad Result');
   }
 
-  back() {
-
+  showDetail(messageToast) {
+    let toast = this.toastCtrl.create({
+      message: messageToast.toUpperCase(),
+      position: 'middle',
+      duration: 2500
+    });
+    toast.present();
   }
 }

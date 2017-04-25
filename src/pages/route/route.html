@@ -36,7 +36,7 @@
 
 
     <ion-item *ngFor="let way of waypoints; let i = index;">
-      <ion-label floating>Parada {{i+1}}:</ion-label>
+      <ion-label floating>Parada:</ion-label>
       <ion-input [(ngModel)]="way.location" value="{{way.location}}" (dblclick)="showModal(i)"></ion-input>
       <button class="search" ion-button (click)="showModal(i)" color="light" item-right detail-none  icon-only>
           <ion-icon name="search"></ion-icon>

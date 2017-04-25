@@ -81,7 +81,6 @@ export class RoutePage {
     this.distance = 0;
     var route = this.result;
     var distance = this.distance;
-    let time = this.time;
     let app = this.appCtrl;
     let origin = this.origin;
     let destination = this.destination;
